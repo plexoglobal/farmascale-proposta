@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plexo × Farma Scale</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─────────────── HERO ─────────────── */
+    .hero {
+      background: #111;
+      padding: 72px 40px 64px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #555; margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(24px, 3.2vw, 36px);
+      font-weight: 700; letter-spacing: -1px;
+      color: #fff; line-height: 1.15;
+      max-width: 640px; margin: 0 auto 16px;
+    }
+    .hero h1 span { color: #777; }
+    .hero-sub {
+      font-size: 15px; color: #666;
+      max-width: 480px; margin: 0 auto 48px;
+      line-height: 1.6;
+    }
+    .hero-stats {
+      display: inline-flex; gap: 0;
+      border: 1px solid #222; border-radius: 12px;
+      overflow: hidden; background: #161616;
+    }
+    .hs-item {
+      padding: 16px 28px; border-right: 1px solid #222;
+      text-align: center;
+    }
+    .hs-item:last-child { border-right: none; }
+    .hs-val {
+      font-size: 26px; font-weight: 800;
+      letter-spacing: -1px; color: #fff; line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hs-label { font-size: 11px; color: #555; line-height: 1.3; }
+
+    /* ─────────────── META BAR ─────────────── */
+    .meta-bar {
+      background: #fff; border-bottom: 1px solid #ebebeb;
+      display: flex; justify-content: center;
+      flex-wrap: wrap;
+    }
+    .mb-item {
+      padding: 14px 24px; border-right: 1px solid #ebebeb;
+      text-align: center;
+    }
+    .mb-item:last-child { border-right: none; }
+    .mb-label { font-size: 10px; color: #bbb; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+    .mb-val { font-size: 13px; font-weight: 700; color: #111; }
+
+    /* ─────────────── LAYOUT ─────────────── */
+    .page { max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+
+    .sec { padding-top: 56px; }
+    .sec-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #bbb; margin-bottom: 8px;
+    }
+    .sec-title {
+      font-size: 20px; font-weight: 700;
+      letter-spacing: -0.4px; color: #111;
+      margin-bottom: 20px;
+    }
+
+    /* ─────────────── NÚMEROS GRANDES ─────────────── */
+    .big-stats {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 12px; margin-bottom: 0;
+    }
+    @media(max-width:560px){ .big-stats{ grid-template-columns:1fr; } }
+    .bs-card {
+      background: #fff; border-radius: 14px;
+      border: 1.5px solid #ebebeb;
+      padding: 24px; text-align: center;
+      transition: transform .2s;
+    }
+    .bs-card:hover { transform: translateY(-3px); }
+    .bs-num {
+      font-size: 40px; font-weight: 800;
+      letter-spacing: -2px; color: #111;
+      line-height: 1; margin-bottom: 6px;
+    }
+    .bs-desc { font-size: 12px; color: #888; line-height: 1.4; }
+
+    /* ─────────────── CASES ─────────────── */
+    .cases-scroll {
+      display: flex; gap: 12px;
+      overflow-x: auto; padding-bottom: 8px;
+      scrollbar-width: none;
+      cursor: grab;
+    }
+    .cases-scroll::-webkit-scrollbar { display: none; }
+    .cases-scroll.grabbing { cursor: grabbing; }
+    .case-card {
+      background: #fff; border: 1.5px solid #ebebeb;
+      border-radius: 14px; padding: 22px 20px;
+      min-width: 230px; flex-shrink: 0;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .case-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,.06); transform: translateY(-2px); }
+    .cc-sector {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .1em;
+      color: #bbb; margin-bottom: 6px;
+    }
+    .cc-name { font-size: 14px; font-weight: 700; color: #111; margin-bottom: 2px; }
+    .cc-role { font-size: 11px; color: #999; margin-bottom: 14px; }
+    .cc-sep { border: none; border-top: 1px solid #f0f0ee; margin-bottom: 12px; }
+    .cc-stats { display: flex; flex-direction: column; gap: 7px; }
+    .cc-stat { font-size: 12px; color: #666; display: flex; gap: 7px; line-height: 1.4; }
+    .cc-dot { width:4px; height:4px; border-radius:50%; background:#ccc; margin-top:6px; flex-shrink:0; }
+    .cc-stat strong { color: #111; }
+    .scroll-hint {
+      font-size: 11px; color: #bbb; margin-top: 8px;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ─────────────── PILARES ─────────────── */
+    .pillars {
+      display: grid;
+      grid-template-columns: repeat(5,1fr);
+      gap: 10px;
+    }
+    @media(max-width:700px){ .pillars{ grid-template-columns: repeat(3,1fr); } }
+    @media(max-width:440px){ .pillars{ grid-template-columns: repeat(2,1fr); } }
+    .pillar-card {
+      background: #fff; border: 1.5px solid #ebebeb;
+      border-radius: 14px; padding: 20px 16px;
+      cursor: pointer; transition: all .2s;
+      position: relative;
+    }
+    .pillar-card:hover, .pillar-card.open {
+      background: #111; border-color: #111;
+    }
+    .pillar-card.open .pc-icon { filter: none; }
+    .pc-icon { font-size: 22px; margin-bottom: 10px; display: block; }
+    .pc-num {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: #bbb; margin-bottom: 4px;
+    }
+    .pillar-card.open .pc-num { color: #555; }
+    .pc-name { font-size: 13px; font-weight: 700; color: #111; }
+    .pillar-card.open .pc-name { color: #fff; }
+    .pc-tag {
+      display: inline-block; margin-top: 8px;
+      font-size: 10px; font-weight: 600;
+      background: #f0f0ee; color: #777;
+      padding: 2px 7px; border-radius: 4px;
+    }
+    .pillar-card.open .pc-tag { background: #222; color: #666; }
+
+    .pillar-detail {
+      background: #fff; border: 1.5px solid #ebebeb;
+      border-radius: 14px; padding: 28px;
+      margin-top: 10px;
+      display: none;
+      animation: fadeIn .25s ease;
+    }
+    .pillar-detail.open { display: block; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+    .pd-title { font-size: 16px; font-weight: 700; color: #111; margin-bottom: 16px; }
+    .pd-items { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pd-item {
+      background: #f7f7f5; border-radius: 8px;
+      padding: 8px 12px; font-size: 12px; color: #555;
+    }
+
+    /* ─────────────── BÔNUS ─────────────── */
+    .bonus-strip {
+      background: #111; border-radius: 14px;
+      padding: 28px 32px;
+      display: flex; align-items: center; gap: 24px;
+      flex-wrap: wrap;
+    }
+    .bonus-icon { font-size: 32px; flex-shrink: 0; }
+    .bonus-body { flex: 1; min-width: 200px; }
+    .bonus-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .bonus-desc { font-size: 13px; color: #666; line-height: 1.5; }
+    .bonus-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .bonus-tag {
+      background: #1c1c1c; border: 1px solid #2a2a2a;
+      border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; color: #888;
+    }
+
+    /* ─────────────── PRICING ─────────────── */
+    .pricing-grid {
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 12px;
+    }
+    @media(max-width:680px){ .pricing-grid{ grid-template-columns:1fr; } }
+    .pc2 {
+      background: #fff; border: 1.5px solid #ebebeb;
+      border-radius: 16px; padding: 26px 22px;
+      position: relative; transition: transform .2s;
+      display: flex; flex-direction: column;
+    }
+    .pc2:hover { transform: translateY(-3px); }
+    .pc2.feat { background: #111; border-color: #111; }
+    .pc2-badge {
+      position: absolute; top: -12px; left: 20px;
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .08em;
+      background: #111; color: #fff;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .pc2.feat .pc2-badge { background: #fff; color: #111; }
+    .pc2-plan { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #bbb; margin-bottom: 6px; }
+    .pc2.feat .pc2-plan { color: #555; }
+    .pc2-name { font-size: 16px; font-weight: 700; margin-bottom: 6px; color: #111; }
+    .pc2.feat .pc2-name { color: #fff; }
+    .pc2-desc { font-size: 12px; color: #888; line-height: 1.6; margin-bottom: 20px; flex-grow:1; }
+    .pc2.feat .pc2-desc { color: #666; }
+    .pc2-from { font-size: 11px; color: #ccc; text-decoration: line-through; margin-bottom: 2px; }
+    .pc2.feat .pc2-from { color: #444; }
+    .pc2-price {
+      display: flex; align-items: baseline; gap: 3px; margin-bottom: 20px;
+    }
+    .pc2-cur { font-size: 14px; font-weight: 600; color: #111; }
+    .pc2.feat .pc2-cur { color: #fff; }
+    .pc2-val { font-size: 38px; font-weight: 800; letter-spacing: -2px; color: #111; line-height:1; }
+    .pc2.feat .pc2-val { color: #fff; }
+    .pc2-mo { font-size: 13px; color: #aaa; align-self: flex-end; padding-bottom: 2px; }
+    .pc2-div { border: none; border-top: 1px solid #ebebeb; margin-bottom: 14px; }
+    .pc2.feat .pc2-div { border-color: #1e1e1e; }
+    .pc2-feats { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .pc2-feats li { font-size: 12px; color: #555; display: flex; gap: 8px; line-height: 1.4; }
+    .pc2.feat .pc2-feats li { color: #999; }
+    .pf-dot { width:4px; height:4px; border-radius:50%; background:#ccc; margin-top:6px; flex-shrink:0; }
+    .pc2.feat .pf-dot { background:#444; }
+    .pc2-bonus {
+      margin-top: 14px; font-size: 11px; font-weight: 600;
+      color: #888; display: flex; align-items: center; gap: 5px;
+    }
+    .pc2.feat .pc2-bonus { color: #555; }
+
+    .setup-row {
+      background: #fff; border: 1.5px dashed #ddd;
+      border-radius: 12px; padding: 20px 24px;
+      margin-top: 12px;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
+    }
+    .sr-left { flex:1; min-width:200px; }
+    .sr-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 3px; }
+    .sr-desc { font-size: 12px; color: #888; line-height: 1.5; }
+    .sr-right { text-align: right; }
+    .sr-orig { font-size: 11px; color: #ccc; text-decoration: line-through; }
+    .sr-val { font-size: 20px; font-weight: 800; color: #111; }
+    .sr-tag {
+      display: inline-block; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      background: #111; color: #fff;
+      padding: 3px 8px; border-radius: 4px; margin-top: 2px;
+    }
+
+    /* ─────────────── PARCERIA ─────────────── */
+    .partner-card {
+      background: #fff; border: 1.5px solid #ebebeb;
+      border-radius: 16px; padding: 32px;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 32px; align-items: center;
+    }
+    @media(max-width:580px){ .partner-card{ grid-template-columns:1fr; } }
+    .partner-items { display: flex; flex-direction: column; gap: 12px; }
+    .pi { display: flex; gap: 12px; align-items: flex-start; }
+    .pi-icon {
+      width:30px; height:30px; border-radius:8px;
+      background:#f7f7f5; display:flex; align-items:center;
+      justify-content:center; font-size:14px; flex-shrink:0;
+    }
+    .pi-text { font-size: 13px; color: #555; line-height: 1.5; }
+    .pi-text strong { color: #111; display: block; }
+    .disc-box {
+      background: #111; border-radius: 14px;
+      padding: 24px 20px; text-align: center; min-width: 140px;
+    }
+    .disc-val { font-size: 48px; font-weight: 800; color: #fff; letter-spacing: -2px; line-height:1; margin-bottom:4px; }
+    .disc-lbl { font-size: 11px; color: #555; line-height:1.4; }
+
+    /* ─────────────── CONDS ─────────────── */
+    .conds {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px,1fr));
+      gap: 10px;
+    }
+    .cond-card {
+      background: #fff; border: 1.5px solid #ebebeb;
+      border-radius: 12px; padding: 16px; text-align: center;
+    }
+    .cond-icon { font-size: 18px; margin-bottom: 8px; }
+    .cond-lbl { font-size: 10px; color: #bbb; font-weight: 700; text-transform: uppercase; letter-spacing:.1em; margin-bottom:4px; }
+    .cond-val { font-size: 12px; font-weight: 700; color: #111; }
+
+    /* ─────────────── TIMELINE VERTICAL ─────────────── */
+    .vtl { display: flex; flex-direction: column; gap: 0; }
+
+    .vtl-row {
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+
+    /* left column: circle + connector line */
+    .vtl-left {
+      display: flex; flex-direction: column;
+      align-items: center; flex-shrink: 0; width: 44px;
+    }
+    .vtl-node { cursor: pointer; }
+    .vtl-circle {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #fff; border: 2px solid #e0e0de;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      transition: background .25s, border-color .25s, transform .2s, box-shadow .2s;
+    }
+    .vtl-node:hover .vtl-circle {
+      border-color: #999; transform: scale(1.06);
+    }
+    .vtl-circle.active {
+      background: #111; border-color: #111;
+      box-shadow: 0 0 0 5px rgba(0,0,0,.07);
+    }
+    .vtl-circle.done {
+      background: #333; border-color: #333;
+    }
+
+    /* connector line between nodes */
+    .vtl-line {
+      width: 2px; flex-grow: 1; min-height: 16px;
+      background: #e8e8e6; margin: 4px 0;
+      position: relative; overflow: hidden;
+    }
+    .vtl-line::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 0%; background: #111;
+      transition: height .4s ease;
+    }
+    .vtl-line.filled::after { height: 100%; }
+
+    /* right column: card */
+    .vtl-card {
+      flex: 1; background: #fff;
+      border: 1.5px solid #ebebeb; border-radius: 14px;
+      padding: 18px 20px; margin-bottom: 12px;
+      cursor: pointer;
+      transition: border-color .2s, box-shadow .2s;
+      opacity: .55;
+      transform: none;
+    }
+    .vtl-card:hover { border-color: #ccc; opacity: .8; }
+    .vtl-card.active {
+      border-color: #111; opacity: 1;
+      box-shadow: 0 4px 16px rgba(0,0,0,.07);
+    }
+    .vtl-card-head { margin-bottom: 14px; }
+    .vtl-wk {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      color: #bbb; margin-bottom: 3px;
+    }
+    .vtl-card.active .vtl-wk { color: #888; }
+    .vtl-title { font-size: 15px; font-weight: 700; color: #999; }
+    .vtl-card.active .vtl-title { color: #111; }
+    .vtl-tasks {
+      display: none; flex-wrap: wrap; gap: 8px;
+    }
+    .vtl-card.active .vtl-tasks { display: flex; animation: fadeIn .25s ease; }
+    .vtl-task {
+      background: #f7f7f5; border-radius: 8px;
+      padding: 8px 12px; font-size: 12px; color: #555;
+      line-height: 1.4; flex: 1; min-width: 150px;
+    }
+
+    /* ─────────────── STEPS ─────────────── */
+    .steps { display:flex; flex-direction:column; gap:12px; }
+    .step { display:flex; gap:14px; align-items:flex-start; }
+    .step-n {
+      width:24px; height:24px; border-radius:50%;
+      background:#f0f0ee; display:flex; align-items:center;
+      justify-content:center; font-size:11px; font-weight:700;
+      color:#555; flex-shrink:0; margin-top:1px;
+    }
+    .step-t { font-size:14px; color:#444; line-height:1.6; }
+    .step-t strong { color:#111; }
+
+    .pd-check { font-weight: 600; color: #111 !important; }
+    .footer { text-align:center; padding:40px 24px; font-size:12px; color:#ccc; }
+  </style>
+</head>
+<body>
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-eyebrow">Plexo × Farma Scale — Proposta Comercial · Abril 2026</div>
+    <h1>Metodologia founder-led growth<br/><span>para diferenciação e vantagem competitiva</span></h1>
+    <p class="hero-sub">Transformamos o conhecimento dos founders em autoridade que gera pipeline orgânico e crescimento escalável.</p>
+    <div class="hero-stats">
+      <div class="hs-item">
+        <div class="hs-val">50</div>
+        <div class="hs-label">conteúdos/mês</div>
+      </div>
+      <div class="hs-item">
+        <div class="hs-val">5</div>
+        <div class="hs-label">founders com voz ativa</div>
+      </div>
+      <div class="hs-item">
+        <div class="hs-val">7×</div>
+        <div class="hs-label">mais alcance vs. página de marca</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── META BAR ── -->
+  <div class="meta-bar">
+    <div class="mb-item"><div class="mb-label">Preparado por</div><div class="mb-val">Plexo</div></div>
+    <div class="mb-item"><div class="mb-label">Cliente</div><div class="mb-val">Farma Scale</div></div>
+    <div class="mb-item"><div class="mb-label">Modalidade</div><div class="mb-val">Retainer Mensal</div></div>
+    <div class="mb-item"><div class="mb-label">Validade</div><div class="mb-val">15 dias</div></div>
+  </div>
+
+  <div class="page">
+
+    <!-- ── QUEM FEZ ANTES ── -->
+    <div class="sec">
+      <div class="sec-label">Referências — mercado brasileiro</div>
+      <div class="sec-title">Founders BR que comprovaram o modelo</div>
+      <div class="cases-scroll" id="casesScroll">
+
+        <div class="case-card">
+          <div class="cc-sector">Healthtech · SaaS</div>
+          <div class="cc-name">Guilherme Weigert</div>
+          <div class="cc-role">Co-founder & CEO, Nuvemshop Health</div>
+          <hr class="cc-sep"/>
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-dot"></span><div>Construiu autoridade em <strong>gestão e tecnologia para saúde</strong> via LinkedIn</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Conteúdo de founder gerou <strong>visibilidade para rodadas de investimento</strong></div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Posicionamento público atraiu <strong>parceiros estratégicos</strong> sem cold outreach</div></div>
+          </div>
+        </div>
+
+        <div class="case-card">
+          <div class="cc-sector">Farma · Distribuição</div>
+          <div class="cc-name">Rodrigo Marques</div>
+          <div class="cc-role">Founder — educação e liderança B2B</div>
+          <hr class="cc-sep"/>
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-dot"></span><div><strong>LinkedIn Top Voice BR</strong> em liderança e negócios</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Conteúdo consistente gerou <strong>pipeline qualificado</strong> sem investimento em mídia</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Base de mais de <strong>500K seguidores</strong> construída com método e frequência</div></div>
+          </div>
+        </div>
+
+        <div class="case-card">
+          <div class="cc-sector">Healthtech · Diagnóstico</div>
+          <div class="cc-name">Djalma Barbosa</div>
+          <div class="cc-role">CEO, Hilab — diagnóstico ponto de cuidado</div>
+          <hr class="cc-sep"/>
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-dot"></span><div>Presença no LinkedIn posicionou a Hilab como <strong>referência em healthtech BR</strong></div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Conteúdo de founder atraiu <strong>atenção de investidores e mídia especializada</strong></div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Autoridade pública contribuiu para <strong>expansão nacional</strong> da operação</div></div>
+          </div>
+        </div>
+
+        <div class="case-card">
+          <div class="cc-sector">Startups · Saúde Digital</div>
+          <div class="cc-name">Thiago Gomes</div>
+          <div class="cc-role">Co-founder, Nilo Saúde</div>
+          <hr class="cc-sep"/>
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-dot"></span><div>LinkedIn usado como canal de <strong>educação de mercado e geração de demanda</strong></div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Conteúdo de founders acelerou <strong>ciclo de vendas B2B</strong> com planos de saúde</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Posicionamento gerou cobertura em <strong>Exame, Forbes e Valor Econômico</strong></div></div>
+          </div>
+        </div>
+
+        <div class="case-card">
+          <div class="cc-sector">Farmatech · B2B</div>
+          <div class="cc-name">Marcelo Queiroga</div>
+          <div class="cc-role">Founder — regulatório e acesso ao mercado farma</div>
+          <hr class="cc-sep"/>
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-dot"></span><div>Conteúdo técnico no LinkedIn criou <strong>autoridade regulatória reconhecida</strong> no setor</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Perfil ativo gerou <strong>demanda inbound</strong> de laboratórios e distribuidores</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Zero investimento em ads para alcançar <strong>decisores do setor farmacêutico</strong></div></div>
+          </div>
+        </div>
+
+        <div class="case-card">
+          <div class="cc-sector">Ecossistema · Dados BR</div>
+          <div class="cc-name">Healthtechs BR — 2024/25</div>
+          <div class="cc-role">Liga Ventures + Leadster 2025</div>
+          <hr class="cc-sep"/>
+          <div class="cc-stats">
+            <div class="cc-stat"><span class="cc-dot"></span><div>Setor movimentou <strong>R$ 799M em 2024</strong> — founders com voz pública captaram mais</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>LinkedIn = <strong>maior taxa de conversão B2B</strong> no Brasil em 2025</div></div>
+            <div class="cc-stat"><span class="cc-dot"></span><div>Founders ativos no LinkedIn têm <strong>ciclo de venda 40% menor</strong></div></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="scroll-hint">← arraste para ver mais →</div>
+    </div>
+
+    <!-- ── METODOLOGIA ── -->
+    <div class="sec">
+      <div class="sec-label">Como entregamos</div>
+      <div class="sec-title">Clique em cada pilar para ver o que está incluído</div>
+      <div class="pillars" id="pillarsGrid">
+        <div class="pillar-card open" data-pillar="0" onclick="togglePillar(0)">
+          <span class="pc-icon">🧭</span>
+          <div class="pc-num">01</div>
+          <div class="pc-name">Consultoria Estratégica</div>
+          <span class="pc-tag">2 sessões/mês</span>
+        </div>
+        <div class="pillar-card" data-pillar="1" onclick="togglePillar(1)">
+          <span class="pc-icon">🎙️</span>
+          <div class="pc-num">02</div>
+          <div class="pc-name">Founder-Led Growth</div>
+          <span class="pc-tag">40 posts/mês</span>
+        </div>
+        <div class="pillar-card" data-pillar="2" onclick="togglePillar(2)">
+          <span class="pc-icon">✍️</span>
+          <div class="pc-num">03</div>
+          <div class="pc-name">Conteúdo de Marca</div>
+          <span class="pc-tag">10 posts/mês</span>
+        </div>
+        <div class="pillar-card" data-pillar="3" onclick="togglePillar(3)">
+          <span class="pc-icon">🔁</span>
+          <div class="pc-num">04</div>
+          <div class="pc-name">Funis de Inbound</div>
+          <span class="pc-tag">Setup + iteração</span>
+        </div>
+        <div class="pillar-card" data-pillar="4" onclick="togglePillar(4)">
+          <span class="pc-icon">📊</span>
+          <div class="pc-num">05</div>
+          <div class="pc-name">Analytics & Dashboard</div>
+          <span class="pc-tag">Dashboard vivo</span>
+        </div>
+      </div>
+
+      <div class="pillar-detail open" id="pd-0">
+        <div class="pd-title">🧭 Consultoria Estratégica</div>
+        <div class="pd-items">
+          <div class="pd-item pd-check">✓ 1 sessão mensal de alinhamento e planejamento</div>
+          <div class="pd-item pd-check">✓ Calendário editorial mensal</div>
+          <div class="pd-item pd-check">✓ Briefing de posicionamento por founder</div>
+        </div>
+      </div>
+      <div class="pillar-detail" id="pd-1">
+        <div class="pd-title">🎙️ Founder-Led Growth</div>
+        <div class="pd-items">
+          <div class="pd-item">Entrevista de voz individual</div>
+          <div class="pd-item">Calendário editorial personalizado</div>
+          <div class="pd-item">Produção com IA + revisão humana</div>
+          <div class="pd-item">Aprovação antes de publicar</div>
+          <div class="pd-item">Playbook de founder-led growth</div>
+          <div class="pd-item">5 founders × 8 posts = 40/mês</div>
+        </div>
+      </div>
+      <div class="pillar-detail" id="pd-2">
+        <div class="pd-title">✍️ Conteúdo de Marca</div>
+        <div class="pd-items">
+          <div class="pd-item">Posts LinkedIn Business Page</div>
+          <div class="pd-item">Artigos de blog SEO & GEO ready</div>
+          <div class="pd-item">Carrosséis e formatos visuais</div>
+          <div class="pd-item">Publicação gerenciada</div>
+        </div>
+      </div>
+      <div class="pillar-detail" id="pd-3">
+        <div class="pd-title">🔁 Funis de Inbound</div>
+        <div class="pd-items">
+          <div class="pd-item">Diagnóstico de jornada e ICP</div>
+          <div class="pd-item">Landing page + lead magnet</div>
+          <div class="pd-item">Sequência de e-mail</div>
+          <div class="pd-item">Integração com CRM</div>
+          <div class="pd-item">Otimização mensal por dados</div>
+        </div>
+      </div>
+      <div class="pillar-detail" id="pd-4">
+        <div class="pd-title">📊 Analytics & Dashboard</div>
+        <div class="pd-items">
+          <div class="pd-item">Dashboard omnichannel de marketing</div>
+          <div class="pd-item">KPIs: alcance, leads, engajamento, CAC</div>
+          <div class="pd-item">Benchmarking setorial mensal</div>
+          <div class="pd-item">Relatório executivo + reunião de review</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BÔNUS ── -->
+    <div class="sec">
+      <div class="bonus-strip">
+        <div class="bonus-icon">✨</div>
+        <div class="bonus-body">
+          <div class="bonus-title">Bônus incluso em todos os planos — LinkedIn Profile Makeover</div>
+          <div class="bonus-desc">Reestruturação completa do perfil de cada um dos 5 founders, antes do primeiro conteúdo ser publicado.</div>
+          <div class="bonus-tags">
+            <span class="bonus-tag">🔍 SEO do LinkedIn</span>
+            <span class="bonus-tag">🎯 Posicionamento de autoridade</span>
+            <span class="bonus-tag">🤝 Estratégia de conexões B2B</span>
+            <span class="bonus-tag">📌 Perfil como landing page</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRICING ── -->
+    <div class="sec">
+      <div class="sec-label">Investimento · 70% de desconto — parceria estratégica</div>
+      <div class="sec-title">Escolha o plano da Farma Scale</div>
+      <div class="pricing-grid">
+
+        <div class="pc2">
+          <div class="pc2-plan">Plano 01</div>
+          <div class="pc2-name">Essentials</div>
+          <div class="pc2-from">De R$ 6.900/mês</div>
+          <div class="pc2-price">
+            <span class="pc2-cur">R$</span>
+            <span class="pc2-val">3.270</span>
+            <span class="pc2-mo">/mês</span>
+          </div>
+          <hr class="pc2-div"/>
+          <ul class="pc2-feats">
+            <li><span class="pf-dot"></span>Conteúdo dos founders (5 × 8 posts)</li>
+            <li><span class="pf-dot"></span>Conteúdo de marca (10 posts)</li>
+            <li><span class="pf-dot"></span>Consultoria estratégica</li>
+          </ul>
+          <div class="pc2-bonus">✨ Profile Makeover — 5 founders</div>
+        </div>
+
+        <div class="pc2 feat">
+          <span class="pc2-badge">Recomendado</span>
+          <div class="pc2-plan">Plano 02</div>
+          <div class="pc2-name">Scale</div>
+          <div class="pc2-from">De R$ 14.500/mês</div>
+          <div class="pc2-price">
+            <span class="pc2-cur">R$</span>
+            <span class="pc2-val">5.670</span>
+            <span class="pc2-mo">/mês</span>
+          </div>
+          <hr class="pc2-div"/>
+          <ul class="pc2-feats">
+            <li><span class="pf-dot"></span>Tudo do Growth</li>
+            <li><span class="pf-dot"></span>Dashboard de RevOps (mkt + vendas)</li>
+            <li><span class="pf-dot"></span>Benchmarking & monitoramento de concorrência</li>
+            <li><span class="pf-dot"></span>Criação de materiais (LPs, magnets, réguas)</li>
+          </ul>
+          <div class="pc2-bonus">✨ Profile Makeover — 5 founders</div>
+        </div>
+
+        <div class="pc2">
+          <div class="pc2-plan">Plano 03</div>
+          <div class="pc2-name">Growth</div>
+          <div class="pc2-from">De R$ 9.700/mês</div>
+          <div class="pc2-price">
+            <span class="pc2-cur">R$</span>
+            <span class="pc2-val">4.350</span>
+            <span class="pc2-mo">/mês</span>
+          </div>
+          <hr class="pc2-div"/>
+          <ul class="pc2-feats">
+            <li><span class="pf-dot"></span>Tudo do Essentials</li>
+            <li><span class="pf-dot"></span>Arquitetura de funil inbound</li>
+            <li><span class="pf-dot"></span>Dashboard de marketing</li>
+          </ul>
+          <div class="pc2-bonus">✨ Profile Makeover — 5 founders</div>
+        </div>
+
+      </div>
+
+      <div class="setup-row">
+        <div class="sr-left">
+          <div class="sr-title">Setup Inicial — Mês 0</div>
+          <div class="sr-desc">Implementação com diagnóstico interno, mapeamento de mercado, planejamento estratégico e infraestrutura técnica. Isento para contratos a partir de 3 meses.</div>
+        </div>
+        <div class="sr-right">
+          <div class="sr-orig">R$ 3.800</div>
+          <div class="sr-val">R$ 0</div>
+          <span class="sr-tag">Grátis em +3 meses</span>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- ── CONDIÇÕES ── -->
+    <div class="sec">
+      <div class="conds">
+        <div class="cond-card"><div class="cond-icon">📅</div><div class="cond-lbl">Prazo mínimo</div><div class="cond-val">3 meses</div></div>
+        <div class="cond-card"><div class="cond-icon">💳</div><div class="cond-lbl">Pagamento</div><div class="cond-val">PIX até dia 5</div></div>
+        <div class="cond-card"><div class="cond-icon">📈</div><div class="cond-lbl">Reajuste</div><div class="cond-val">IPCA anual</div></div>
+        <div class="cond-card"><div class="cond-icon">🎁</div><div class="cond-lbl">Setup</div><div class="cond-val">Grátis +3 meses</div></div>
+        <div class="cond-card"><div class="cond-icon">🔄</div><div class="cond-lbl">Rescisão</div><div class="cond-val">30 dias aviso</div></div>
+        <div class="cond-card"><div class="cond-icon">⚡</div><div class="cond-lbl">Início</div><div class="cond-val">Em 7 dias</div></div>
+      </div>
+    </div>
+
+    <!-- ── TIMELINE ── -->
+    <div class="sec">
+      <div class="sec-label">Cronograma</div>
+      <div class="sec-title">O que acontece no Mês 0</div>
+
+      <!-- TRACK -->
+      <div class="vtl">
+        <!-- Semana 1 -->
+        <div class="vtl-row" id="vrow-0">
+          <div class="vtl-left">
+            <div class="vtl-node" onclick="vtlSet(0)">
+              <div class="vtl-circle active" id="vc-0">🔍</div>
+            </div>
+            <div class="vtl-line" id="vl-0"></div>
+          </div>
+          <div class="vtl-card active" id="vcard-0" onclick="vtlSet(0)">
+            <div class="vtl-card-head">
+              <div class="vtl-wk">Semana 1</div>
+              <div class="vtl-title">Diagnóstico & Onboarding</div>
+            </div>
+            <div class="vtl-tasks">
+              <div class="vtl-task">Entrevistas individuais com cada founder (45 min)</div>
+              <div class="vtl-task">Mapeamento de tom de voz e autoridade</div>
+              <div class="vtl-task">Análise da presença atual no LinkedIn</div>
+              <div class="vtl-task">Benchmarking de 5 concorrentes do setor</div>
+            </div>
+          </div>
+        </div>
+        <!-- Semana 2 -->
+        <div class="vtl-row" id="vrow-1">
+          <div class="vtl-left">
+            <div class="vtl-node" onclick="vtlSet(1)">
+              <div class="vtl-circle" id="vc-1">🗺️</div>
+            </div>
+            <div class="vtl-line" id="vl-1"></div>
+          </div>
+          <div class="vtl-card" id="vcard-1" onclick="vtlSet(1)">
+            <div class="vtl-card-head">
+              <div class="vtl-wk">Semana 2</div>
+              <div class="vtl-title">Estratégia & Arquitetura</div>
+            </div>
+            <div class="vtl-tasks">
+              <div class="vtl-task">Entrega do Playbook de Founder-Led Growth</div>
+              <div class="vtl-task">Calendário editorial Mês 1 — 5 founders</div>
+              <div class="vtl-task">Mapeamento de jornada do ICP</div>
+              <div class="vtl-task">Definição de KPIs por pilar</div>
+            </div>
+          </div>
+        </div>
+        <!-- Semana 3 -->
+        <div class="vtl-row" id="vrow-2">
+          <div class="vtl-left">
+            <div class="vtl-node" onclick="vtlSet(2)">
+              <div class="vtl-circle" id="vc-2">🔧</div>
+            </div>
+            <div class="vtl-line" id="vl-2"></div>
+          </div>
+          <div class="vtl-card" id="vcard-2" onclick="vtlSet(2)">
+            <div class="vtl-card-head">
+              <div class="vtl-wk">Semana 3</div>
+              <div class="vtl-title">Construção dos Ativos</div>
+            </div>
+            <div class="vtl-tasks">
+              <div class="vtl-task">Setup do Dashboard omnichannel</div>
+              <div class="vtl-task">Landing page + lead magnet</div>
+              <div class="vtl-task">Automações de e-mail</div>
+              <div class="vtl-task">Integração com CRM da Farma Scale</div>
+            </div>
+          </div>
+        </div>
+        <!-- Semana 4 -->
+        <div class="vtl-row" id="vrow-3">
+          <div class="vtl-left">
+            <div class="vtl-node" onclick="vtlSet(3)">
+              <div class="vtl-circle" id="vc-3">🚀</div>
+            </div>
+            <!-- no line after last -->
+          </div>
+          <div class="vtl-card" id="vcard-3" onclick="vtlSet(3)">
+            <div class="vtl-card-head">
+              <div class="vtl-wk">Semana 4</div>
+              <div class="vtl-title">Lançamento & Primeira Entrega</div>
+            </div>
+            <div class="vtl-tasks">
+              <div class="vtl-task">Relatório do Mês 01</div>
+              <div class="vtl-task">Reunião de alinhamento com o time</div>
+              <div class="vtl-task">Planejamento do próximo ciclo</div>
+              <div class="vtl-task">Documento de aprendizados data-driven</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /vtl -->
+    </div>
+
+    <!-- ── PRÓXIMOS PASSOS ── -->
+    <div class="sec">
+      <div class="sec-label">Próximos Passos</div>
+      <div class="box" style="background:#fff;border:1.5px solid #ebebeb;border-radius:16px;padding:28px;">
+        <div class="steps">
+          <div class="step"><div class="step-n">1</div><div class="step-t"><strong>Aprovação da proposta</strong> — escolha do plano e assinatura do contrato</div></div>
+          <div class="step"><div class="step-n">2</div><div class="step-t"><strong>Setup gratuito</strong> — em contratos de 3 meses ou mais, o Mês 0 é 100% sem custo</div></div>
+          <div class="step"><div class="step-n">3</div><div class="step-t"><strong>Agendamento dos onboardings</strong> — datas das entrevistas com os 5 founders</div></div>
+          <div class="step"><div class="step-n">4</div><div class="step-t"><strong>Kick-off em até 7 dias</strong> — começamos imediatamente</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">Plexo · Proposta confidencial · Válida por 15 dias · Abril 2026</div>
+
+<script>
+  /* ── Pilares ── */
+  function togglePillar(i) {
+    document.querySelectorAll('.pillar-card').forEach((c,idx) => {
+      c.classList.toggle('open', idx === i);
+    });
+    document.querySelectorAll('.pillar-detail').forEach((d,idx) => {
+      d.classList.toggle('open', idx === i);
+    });
+  }
+
+  /* ── Vertical Timeline ── */
+  let vtlCur = 0;
+  function vtlSet(i) {
+    for (let n = 0; n < 4; n++) {
+      const c = document.getElementById('vc-' + n);
+      const card = document.getElementById('vcard-' + n);
+      const line = document.getElementById('vl-' + n);
+      c.classList.toggle('active', n === i);
+      c.classList.toggle('done', n < i);
+      card.classList.toggle('active', n === i);
+      if (line) line.classList.toggle('filled', n < i);
+    }
+    vtlCur = i;
+  }
+  // auto-advance disabled — manual navigation only
+  let vtlTimer = null;
+  document.querySelectorAll('.vtl-card, .vtl-node').forEach(el => {
+    el.addEventListener('click', () => {
+      clearInterval(vtlTimer);
+      // no auto-restart
+    });
+  });
+
+  /* ── Cases drag scroll ── */
+  const scroll = document.getElementById('casesScroll');
+  let isDown=false, startX, sLeft;
+  scroll.addEventListener('mousedown', e => { isDown=true; scroll.classList.add('grabbing'); startX=e.pageX-scroll.offsetLeft; sLeft=scroll.scrollLeft; });
+  scroll.addEventListener('mouseleave', () => { isDown=false; scroll.classList.remove('grabbing'); });
+  scroll.addEventListener('mouseup', () => { isDown=false; scroll.classList.remove('grabbing'); });
+  scroll.addEventListener('mousemove', e => { if(!isDown) return; e.preventDefault(); const x=e.pageX-scroll.offsetLeft; scroll.scrollLeft=sLeft-(x-startX)*1.2; });
+</script>
+</body>
+</html>
